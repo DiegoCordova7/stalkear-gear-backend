@@ -13,3 +13,7 @@ spring:
 
 server:
   port: ${PORT:8080}
+
+stripe:
+  secret-key: ${STRIPE_SECRET_KEY:}
+  currency: mxn

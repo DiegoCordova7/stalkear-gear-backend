@@ -30,4 +30,6 @@ public class User {
 
   @NotBlank
   private String role;
+
+  private Boolean active = true;
 }

@@ -1,22 +1,29 @@
 package universidad.eccomerce.config;
 
+import universidad.eccomerce.model.Order;
+import universidad.eccomerce.model.OrderItem;
 import universidad.eccomerce.model.Product;
 import universidad.eccomerce.model.User;
+import universidad.eccomerce.repository.IOrderRepository;
 import universidad.eccomerce.repository.IProductRepository;
 import universidad.eccomerce.repository.IUserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import universidad.eccomerce.service.OrderService;
+
+import java.util.List;
 
 @Configuration
 public class DataInitializer {
 
   @Bean
-  public CommandLineRunner initData(IProductRepository productRepo, IUserRepository userRepo) {
+  public CommandLineRunner initData(IProductRepository productRepo, IUserRepository userRepo, IOrderRepository orderRepo, OrderService orderService) {
     return args -> {
       if (userRepo.count() == 0) {
-        userRepo.save(new User("user-admin", "Comandante Admin", "admin@stalkear.com", "admin", "admin"));
-        userRepo.save(new User("user-001", "Stalker Operador", "cliente@stalkear.com", "123", "client"));
+        userRepo.save(new User("user-admin", "Comandante Admin", "admin@stalkear.com", "admin", "admin", true));
+        userRepo.save(new User("user-001", "Stalker Operador", "cliente@stalkear.com", "123", "client", true));
+        userRepo.save(new User("user-002", "Diego Cordova", "cordovadiegoeemilio@gmail.com", "12345", "client", true));
       }
 
       if (productRepo.count() == 0) {
@@ -169,6 +176,44 @@ public class DataInitializer {
         p10.setCamuflaje("Coyote Brown");
         p10.setGradoMilitar("Óptica Avanzada");
         productRepo.save(p10);
+      }
+
+      if (orderRepo.count() == 0) {
+        Order o1 = new Order();
+        o1.setId("ord-00001");
+        o1.setUserId("user-002");
+        o1.setCustomerName("Diego Cordova");
+        o1.setCustomerEmail("cordovadiegoeemilio@gmail.com");
+        o1.setShippingAddress("Av. Principal 123");
+        o1.setPaymentMethod("STRIPE");
+        o1.setStatus("PENDIENTE_PAGO");
+
+        OrderItem i1 = new OrderItem();
+        i1.setProductId("prod-002");
+        i1.setQuantity(1);
+
+        OrderItem i2 = new OrderItem();
+        i2.setProductId("prod-009");
+        i2.setQuantity(2);
+
+        o1.setItems(List.of(i1, i2));
+        orderService.createOrder(o1);
+
+        Order o2 = new Order();
+        o2.setId("ord-00002");
+        o2.setUserId("user-001");
+        o2.setCustomerName("Stalker Operador");
+        o2.setCustomerEmail("cliente@stalkear.com");
+        o2.setShippingAddress("Sector Norte 45");
+        o2.setPaymentMethod("STRIPE");
+        o2.setStatus("PENDIENTE_PAGO");
+
+        OrderItem i3 = new OrderItem();
+        i3.setProductId("prod-006");
+        i3.setQuantity(1);
+
+        o2.setItems(List.of(i3));
+        orderService.createOrder(o2);
       }
     };
   }
